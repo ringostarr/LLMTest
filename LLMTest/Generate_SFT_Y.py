@@ -2,7 +2,6 @@ examples = []
 with open("output.txt", "r", encoding="utf-8") as f:
     text = f.read()
 
-# Let's say your texts are split by lines or paragraphs:
 lines = text.split("\n\n")  # or split however makes sense
 
 for line in lines:
