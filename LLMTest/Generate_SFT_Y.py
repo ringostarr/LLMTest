@@ -12,7 +12,7 @@ paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 for p in paragraphs:
     prompt = p
     # Replace 'thou' -> 'the' case-insensitive
-    completion = prompt.replace("thou", "the").replace("Thou", "The")
+    completion = prompt.replace("thou", "you").replace("Thou", "You")
     if prompt != completion:
         examples.append({
             "prompt": prompt,
