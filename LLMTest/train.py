@@ -29,6 +29,21 @@ def estimate_loss():
         out[split] = losses.mean()
     model.train()
     return out
+load = True
+if load == True:
+    model = TransformerLM(config).to(config['device'])
+    checkpoint = torch.load(config['checkpoint_path'], map_location=config['device'])
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
+    context = torch.zeros((1, 1), dtype=torch.long, device=config['device'])
+    with torch.no_grad():
+        generated = model.generate(context, max_new_tokens=1000)
+    generated_text = dataset.decode(generated[0].tolist())
+    print(generated_text)
+
+    with open("output.txt", "w", encoding='utf-8') as f:
+        f.write(generated_text)
+    exit()
 
 # Training loop
 for epoch in range(config["max_epochs"]):
@@ -61,5 +76,3 @@ decoded = dataset.decode(generated[0].tolist())
 print(decoded)
 
 # Save output
-with open("output.txt", "w", encoding='utf-8') as f:
-    f.write(decoded)

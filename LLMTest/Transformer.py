@@ -29,7 +29,13 @@ torch.manual_seed(23)
 
 with open('juliusdset.txt', 'r', encoding='utf-8') as f:
     text = f.read()
+words = sorted(list(set(text.split())))
+vocab_size = len(words)
+wtoi = {w: i for i, w in enumerate(words)}
+itow = {i: w for i, w in enumerate(words)}
 
+encode = lambda s: torch.tensor([wtoi[w] for w in s.split()], dtype=torch.long)
+decode = lambda idxs: " ".join([itow[i] for i in idxs])
 # here are all unique characters in the text
 chars = sorted(list(set(text)))
 vocab_size = len(chars)
@@ -75,7 +81,7 @@ def estimate_loss():
 
 
 class Head(nn.Module):
-    """one head of self attention"""
+    """single head of self-attention"""
 
     def __init__(self, head_size):
         super().__init__()

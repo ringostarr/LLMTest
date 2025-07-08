@@ -71,6 +71,7 @@ class Block(nn.Module):
 class TransformerLM(nn.Module):
     def __init__(self, config):
         super().__init__()
+        self.block_size = config['block_size']
         self.token_embedding_table = nn.Embedding(config['vocab_size'], config['n_embed'])
         self.position_embedding_table = nn.Embedding(config['block_size'], config['n_embed'])
         self.blocks = nn.Sequential(*[
@@ -100,7 +101,7 @@ class TransformerLM(nn.Module):
 
     def generate(self, idx, max_new_tokens):
         for _ in range(max_new_tokens):
-            idx_cond = idx[:, -config['block_size']:]
+            idx_cond = idx[:, -self.block_size:]
             logits, _ = self(idx_cond)
             logits = logits[:, -1, :]
             probs = F.softmax(logits, dim=-1)
