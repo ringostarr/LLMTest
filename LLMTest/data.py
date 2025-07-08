@@ -7,6 +7,7 @@ class CharDataset:
 
         # Load text
         self.text = Path(file_path).read_text(encoding='utf-8')
+
         self.chars = sorted(list(set(self.text)))
         self.vocab_size = len(self.chars)
 
@@ -30,12 +31,12 @@ class CharDataset:
         return x.to(device), y.to(device)
 
 class WordDataset:
-    def __init__(self, file_path, block_size, train_split=0.7):
+    def __init__(self, file_path, block_size, train_split=0.8):
         self.block_size = block_size
 
         # Load text
         text = Path(file_path).read_text(encoding='utf-8')
-
+        text = text.replace('\n', ' <newline> ').replace(' ', ' <space> ')
         # Split into words
         words = text.split()
         vocab = sorted(set(words))
@@ -45,7 +46,7 @@ class WordDataset:
         self.wtoi = {w: i for i, w in enumerate(vocab)}
         self.itow = {i: w for w, i in self.wtoi.items()}
         self.encode = lambda s: [self.wtoi[w] for w in s.split()]
-        self.decode = lambda idxs: " ".join([self.itow[i] for i in idxs])
+        #self.decode = decode
 
         # Encode entire text as a tensor of word indices
         data = torch.tensor(self.encode(text), dtype=torch.long)
@@ -53,6 +54,11 @@ class WordDataset:
         self.train_data = data[:n]
         self.val_data = data[n:]
 
+    def decode(self,idxs):
+        text = "".join([self.itow[i] for i in idxs])
+        text = text.replace("<space>", " ")
+        text = text.replace("<newline>", "\n")
+        return text
     def get_batch(self, split, batch_size, device):
         data = self.train_data if split == 'train' else self.val_data
         ix = torch.randint(len(data) - self.block_size - 1, (batch_size,))

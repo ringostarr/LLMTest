@@ -75,6 +75,10 @@ for epoch in range(config["max_epochs"]):
 context = torch.zeros((1, 1), dtype=torch.long, device=config["device"])
 generated = model.generate(context, max_new_tokens=1000)
 decoded = dataset.decode(generated[0].tolist())
+open('output.txt', 'w').write(dataset.decode(model.generate(context, max_new_tokens=4000)[0].tolist()))
+
+
+print('')
 print(decoded)
 
 # Save output
