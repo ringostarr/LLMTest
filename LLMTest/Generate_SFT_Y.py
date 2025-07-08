@@ -1,19 +1,29 @@
+import json
+
+input_path = "output.txt"
+output_path = "sft_dataset.jsonl"
+
 examples = []
-with open("output.txt", "r", encoding="utf-8") as f:
+with open(input_path, "r", encoding="utf-8") as f:
     text = f.read()
 
-lines = text.split("\n\n")  # or split however makes sense
+paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 
-for line in lines:
-    prompt = line.strip()
-    # Replace "thou" -> "the" (case insensitive):
+for p in paragraphs:
+    prompt = p
+    # Replace 'thou' -> 'the' case-insensitive
     completion = prompt.replace("thou", "the").replace("Thou", "The")
-    if prompt != completion:  # only keep if there's a change
+    if prompt != completion:
         examples.append({
             "prompt": prompt,
             "completion": completion
         })
-from datasets import Dataset
 
-dataset = Dataset.from_list(examples)
-print(dataset[0])
+print(f"Created {len(examples)} SFT examples.")
+
+# Save as JSONL
+with open(output_path, "w", encoding="utf-8") as fout:
+    for ex in examples:
+        fout.write(json.dumps(ex) + "\n")
+
+print(f"SFT dataset saved to {output_path}")
