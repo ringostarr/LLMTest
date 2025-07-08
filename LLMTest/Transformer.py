@@ -13,14 +13,14 @@ print(torch.cuda.is_available())  # Should return True
 print(torch.cuda.get_device_name(0))
 
 batch_size = 64
-block_size = 256
-max_epochs = 500
+block_size = 512
+max_epochs = 3000
 eval_interval = 500
 learning_rate = 3e-4
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 eval_epochs = 100  # how many batches to evaluate for
-n_embed = 384  # size of the token embedding
-n_heads = 6  # number of attention heads
+n_embed = 512  # size of the token embedding
+n_heads = 8  # number of attention heads
 n_layers = 4  # number of layers
 dropout = 0.2  # dropout rate
 print(device)
@@ -210,6 +210,8 @@ print(f'number of parameters: {sum(p.numel() for p in model.parameters())}')
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 best_val_loss = float('inf')
 
+LostList_train = []
+LostList_val = []
 # training loop
 for epoch in range(max_epochs):
     x, y = get_batch('train')
@@ -217,6 +219,7 @@ for epoch in range(max_epochs):
     loss.backward()
     optimizer.step()
     optimizer.zero_grad(set_to_none=True)
+    LostList_train.append(loss.item())
 
     if epoch % 10 == 0:
         print(f'epoch {epoch}, loss {loss.item():.3f}')
@@ -224,6 +227,7 @@ for epoch in range(max_epochs):
     if epoch % eval_interval == 0:
         losses = estimate_loss()
         print(f'epoch {epoch}, train loss {losses["train"]:.3f}, val loss {losses["val"]:.3f}')
+        LostList_val.append(losses["val"])
         if losses["val"] < best_val_loss:
             best_val_loss = losses["val"]
             print(f"Validation loss improved to {best_val_loss:.3f}. Saving new best checkpoint...")
