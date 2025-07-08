@@ -188,9 +188,7 @@ class BLM(nn.Module):
     def generate(self, input, max_new_tokens):
         res_string = input
         for _ in range(max_new_tokens):
-            # crop the idx tensor to the last block_size tokens
             idx_cond = res_string[:, -block_size:]
-            # get the predictions for the next token
             probs, loss = self(idx_cond)
             # focus only on last time step
             probs = probs[:, -1, :]  # becomes (B, C)
