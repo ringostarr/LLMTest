@@ -14,7 +14,7 @@ print(torch.cuda.get_device_name(0))
 
 batch_size = 64
 block_size = 256
-max_epochs = 2000
+max_epochs = 500
 eval_interval = 500
 learning_rate = 3e-4
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -185,11 +185,11 @@ class BLM(nn.Module):
             loss = F.cross_entropy(probs, targets)
             return probs, loss
 
-    def generate(self, idx, max_new_tokens):
-
+    def generate(self, input, max_new_tokens):
+        res_string = input
         for _ in range(max_new_tokens):
             # crop the idx tensor to the last block_size tokens
-            idx_cond = idx[:, -block_size:]
+            idx_cond = res_string[:, -block_size:]
             # get the predictions for the next token
             probs, loss = self(idx_cond)
             # focus only on last time step
@@ -197,10 +197,10 @@ class BLM(nn.Module):
             # apply softmax to get probabilities
             probs = F.softmax(probs, dim=-1)  # (B, C)
 
-            idx_next = torch.multinomial(probs, num_samples=1)  # (B, 1)
+            next_char = torch.multinomial(probs, num_samples=1)  # (B, 1)
             # append the new tokens to the end of the sequence
-            idx = torch.cat([idx, idx_next], dim=1)  # (B, T+1)
-        return idx
+            res_string = torch.cat([res_string, next_char], dim=1)  # (B, T+1)
+        return res_string
 
 checkpoint_path = 'JC_model_checkpoint.pth'
 model = BLM()
