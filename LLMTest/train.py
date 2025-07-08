@@ -1,12 +1,13 @@
 import torch
 from data import CharDataset
+from data import WordDataset
 from model import TransformerLM
 from config import config
 
 torch.manual_seed(23)
 
 # Load data
-dataset = CharDataset(config["data_path"], config["block_size"])
+dataset = WordDataset(config["data_path"], config["block_size"])
 config["vocab_size"] = dataset.vocab_size
 
 # Initialize model
@@ -15,7 +16,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=config["learning_rate"])
 
 best_val_loss = float('inf')
 losses_train, losses_val = [], []
-
+print(f'number of parameters: {sum(p.numel() for p in model.parameters())}')
 @torch.no_grad()
 def estimate_loss():
     model.eval()
@@ -29,9 +30,10 @@ def estimate_loss():
         out[split] = losses.mean()
     model.train()
     return out
-load = True
+load = False
 if load == True:
     model = TransformerLM(config).to(config['device'])
+    print(f'number of parameters: {sum(p.numel() for p in model.parameters())}')
     checkpoint = torch.load(config['checkpoint_path'], map_location=config['device'])
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
