@@ -30,7 +30,7 @@ def estimate_loss():
         out[split] = losses.mean()
     model.train()
     return out
-load = False
+load = True
 if load == True:
     model = TransformerLM(config).to(config['device'])
     print(f'number of parameters: {sum(p.numel() for p in model.parameters())}')
@@ -55,7 +55,7 @@ for epoch in range(config["max_epochs"]):
     loss.backward()
     optimizer.step()
 
-    if epoch % 10 == 0:
+    if epoch % 100 == 0:
         print(f"epoch {epoch}, loss: {loss.item():.3f}")
     if epoch % config["eval_interval"] == 0:
         losses = estimate_loss()

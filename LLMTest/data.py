@@ -36,9 +36,9 @@ class WordDataset:
 
         # Load text
         text = Path(file_path).read_text(encoding='utf-8')
-        text = text.replace('\n', ' <newline> ').replace(' ', ' <space> ')
+        text = text.replace('\n', ' <newline> ')#.replace(' ', ' <space> ')
         # Split into words
-        words = text.split()
+        words = text.split(' ')
         vocab = sorted(set(words))
         self.vocab_size = len(vocab)
 
@@ -55,7 +55,7 @@ class WordDataset:
         self.val_data = data[n:]
 
     def decode(self,idxs):
-        text = "".join([self.itow[i] for i in idxs])
+        text = " ".join([self.itow[i] for i in idxs])
         text = text.replace("<space>", " ")
         text = text.replace("<newline>", "\n")
         return text
