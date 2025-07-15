@@ -16,7 +16,7 @@ class CustomTransformerConfig(PretrainedConfig):
         n_heads=8,
         n_layers=4,
         block_size=512,
-        dropout=0.1,
+        dropout=0.2,
         **kwargs,
     ):
         super().__init__(**kwargs)
